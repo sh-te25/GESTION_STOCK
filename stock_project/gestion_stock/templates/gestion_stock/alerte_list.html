@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Alertes actives</h2>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Produit</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alerte in alertes %}
+            <tr class="{% if not alerte.est_resolue %}table-danger{% endif %}">
+                <td>{{ alerte.date_creation|date:"d/m/Y H:i" }}</td>
+                <td>{{ alerte.produit.nom }}</td>
+                <td>{{ alerte.get_type_alerte_display }}</td>
+                <td>{{ alerte.message }}</td>
+                <td>
+                    {{ alerte.est_resolue|yesno:"Résolue,Active" }}
+                    {% if not alerte.est_resolue and user.profilutilisateur.role in 'admin gestionnaire' %}
+                        <a href="{% url 'alerte_resoudre' alerte.pk %}" class="btn btn-sm btn-outline-success ms-2">
+                            Marquer comme résolue
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Aucune alerte active.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

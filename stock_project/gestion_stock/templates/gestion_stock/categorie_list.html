@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Catégories</h2>
+
+{% if user.is_authenticated and user.profilutilisateur.role in 'admin gestionnaire' %}
+    <a href="{% url 'categorie_create' %}" class="btn btn-primary mb-3">Ajouter une catégorie</a>
+{% endif %}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for categorie in categories %}
+            <tr>
+                <td>{{ categorie.nom }}</td>
+                <td>{{ categorie.description }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">Aucune catégorie disponible.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

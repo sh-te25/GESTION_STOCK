@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Produits en stock</h2>
+
+<div class="mb-3">
+    {% if user.is_authenticated and user.profilutilisateur.role in 'admin gestionnaire' %}
+        <a href="{% url 'produit_create' %}" class="btn btn-primary">Ajouter un produit</a>
+    {% endif %}
+    <a href="{% url 'export_pdf_inventaire' %}" class="btn btn-outline-secondary ms-2">Exporter PDF</a>
+</div>
+
+<form method="get" class="row mb-4 g-2 align-items-end">
+    <div class="col-md-3">
+        <label for="recherche">Recherche</label>
+        <input type="text" name="q" id="recherche" class="form-control" value="{{ request.GET.q }}">
+    </div>
+    <div class="col-md-2">
+        <label for="categorie">Catégorie</label>
+        <select name="categorie" id="categorie" class="form-select">
+            <option value="">-- Toutes --</option>
+            {% for c in categories %}
+                <option value="{{ c.id }}" {% if request.GET.categorie == c.id|stringformat:"s" %}selected{% endif %}>
+                    {{ c.nom }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="fournisseur">Fournisseur</label>
+        <select name="fournisseur" id="fournisseur" class="form-select">
+            <option value="">-- Tous --</option>
+            {% for f in fournisseurs %}
+                <option value="{{ f.id }}" {% if request.GET.fournisseur == f.id|stringformat:"s" %}selected{% endif %}>
+                    {{ f.nom }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="qmin">Quantité min</label>
+        <input type="number" name="qmin" id="qmin" class="form-control" value="{{ request.GET.qmin }}">
+    </div>
+    <div class="col-md-2">
+        <label for="sort">Trier par</label>
+        <select name="sort" id="sort" class="form-select">
+            <option value="">-- Aucun --</option>
+            <option value="nom" {% if request.GET.sort == 'nom' %}selected{% endif %}>Nom A-Z</option>
+            <option value="-nom" {% if request.GET.sort == '-nom' %}selected{% endif %}>Nom Z-A</option>
+            <option value="quantite_stock" {% if request.GET.sort == 'quantite_stock' %}selected{% endif %}>Quantité ↑</option>
+            <option value="-quantite_stock" {% if request.GET.sort == '-quantite_stock' %}selected{% endif %}>Quantité ↓</option>
+            <option value="prix_unitaire" {% if request.GET.sort == 'prix_unitaire' %}selected{% endif %}>Prix ↑</option>
+            <option value="-prix_unitaire" {% if request.GET.sort == '-prix_unitaire' %}selected{% endif %}>Prix ↓</option>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Nom</th>
+            <th>Référence</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+            <th>Actions</th>
+            <th>Péremption</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for produit in produits %}
+            <tr>
+                <td>{{ produit.nom }}</td>
+                <td>{{ produit.code_reference }}</td>
+                <td>{{ produit.quantite_stock }}</td>
+                <td>{{ produit.prix_unitaire }}</td>
+                <td>
+                    {% if user.is_authenticated and user.profilutilisateur.role in 'admin gestionnaire' %}
+                        <a href="{% url 'produit_update' produit.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+                        <a href="{% url 'produit_delete' produit.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+                    {% else %}
+                        <span class="text-muted">Lecture seule</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if produit.date_peremption %}
+                        {{ produit.date_peremption|date:"d/m/Y" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Ajouter une catégorie</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a href="{% url 'categorie_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}
