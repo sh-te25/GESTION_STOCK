@@ -1,0 +1,4 @@
+Django>=4.2,<5.0
+mysqlclient>=2.1
+reportlab>=3.6
+Pillow>=10.0

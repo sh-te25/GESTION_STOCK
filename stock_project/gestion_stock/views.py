@@ -23,6 +23,8 @@ from .forms import (
 from .utils import role_required
 
 
+
+@method_decorator(role_required(['admin']), name='dispatch')
 class RegisterView(FormView):
     template_name = 'gestion_stock/register.html'
     form_class = UserRegisterForm
@@ -30,10 +32,10 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         user = form.save()
+        role = form.cleaned_data['role']
         profil = user.profilutilisateur
-        profil.role = form.cleaned_data['role']
+        profil.role = role
         profil.save()
-        login(self.request, user)
         return super().form_valid(form)
 
 
